@@ -170,6 +170,66 @@ class Conference < ActiveRecord::Base
   end
 
   ##
+  # Returns an array with the summarized ticket sales per week.
+  #
+  # ====Returns
+  #  * +Array+ -> e.g. [0, 3, 3, 5] -> first week 0, second week 3 tickets sold
+  def get_tickets_sold_per_week
+    result = []
+
+    if tickets &&
+        ticket_purchases &&
+        registration_period &&
+        registration_period.start_date &&
+        registration_period.end_date
+
+      tickets_sold = ticket_purchases.group(:week).sum(:quantity)
+      start_week = get_registration_start_week
+      weeks = registration_weeks
+      result = calculate_items_per_week(start_week, weeks, tickets_sold)
+    end
+    result
+  end
+
+  ##
+  # Returns an hash with ticket sales by ticket title
+  # per week.
+  #
+  # ====Returns
+  #  * +Array+ -> e.g. 'Free Access' => [0, 3, 3, 5]  -> first week 0 tickets sold, second week 3 tickets sold.
+  def get_tickets_data
+    result = {}
+    if tickets &&
+      ticket_purchases
+
+      tickets_per_ticket_id_and_week = ticket_purchases.group(:ticket_id, :week).sum(:quantity)
+
+      start_week = get_registration_start_week
+      weeks = registration_weeks
+
+      tickets_by_id_per_week = {}
+
+      tickets.each do |ticket|
+        tickets_by_id_per_week[ticket.id] = {}
+        (start_week...(start_week + weeks)).each do |week|
+          tickets_by_id_per_week[ticket.id][week] = 0
+        end
+      end
+
+      tickets_per_ticket_id_and_week.each do |ticket_week, value|
+        tickets_by_id_per_week[ticket_week[0]][ticket_week[1]] = value
+      end
+
+      tickets_by_id_per_week.each do |ticket, values|
+        result[Ticket.find(ticket).title] = pad_array_left_not_kumulative(start_week, values)
+      end
+
+      result['Weeks'] = weeks > 0 ? (1..weeks).to_a : 0
+    end
+    result
+  end
+
+  ##
   # Calculates how many weeks the registration is.
   #
   # ====Returns
