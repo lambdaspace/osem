@@ -50,8 +50,8 @@ module Admin
       @ratings = @event.votes.includes(:user)
       @difficulty_levels = @program.difficulty_levels
       @versions = @event.versions |
-       PaperTrail::Version.where(item_type: 'Commercial').where_object(commercialable_id: @event.id, commercialable_type: 'Event') |
-       PaperTrail::Version.where(item_type: 'Commercial').where_object_changes(commercialable_id: @event.id, commercialable_type: 'Event') |
+       PaperTrail::Version.where(item_type: 'Commercial').where('object LIKE ?', "%commercialable_id: #{@event.id}\ncommercialable_type: Event%") |
+       PaperTrail::Version.where(item_type: 'Commercial').where('object_changes LIKE ?', "%commercialable_id:\n- \n- #{@event.id}\ncommercialable_type:\n- \n- Event%") |
        PaperTrail::Version.where(item_type: 'Vote').where('object_changes LIKE ?', "%\nevent_id:\n- \n- #{@event.id}\n%") |
        PaperTrail::Version.where(item_type: 'Vote').where('object LIKE ?', "%\nevent_id: #{@event.id}\n%")
     end
@@ -62,7 +62,6 @@ module Admin
       @comments = @event.root_comments
       @comment_count = @event.comment_threads.count
       @user = @event.submitter
-      @users = User.all.order(:name)
       @url = admin_conference_program_event_path(@conference.short_title, @event)
       @languages = @program.languages_list
     end
@@ -80,7 +79,6 @@ module Admin
     end
 
     def update
-      @users = User.all.order(:name)
       @languages = @program.languages_list
       if @event.update_attributes(event_params)
 
@@ -99,7 +97,6 @@ module Admin
 
     def create
       @url = admin_conference_program_events_path(@conference.short_title, @event)
-      @users = User.all.order(:name)
       @languages = @program.languages_list
       @event.submitter = current_user
 
@@ -115,7 +112,6 @@ module Admin
     def new
       @url = admin_conference_program_events_path(@conference.short_title, @event)
       @languages = @program.languages_list
-      @users = User.all.order(:name)
     end
 
     def accept

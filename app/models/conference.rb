@@ -67,6 +67,7 @@ class Conference < ActiveRecord::Base
   before_create :create_email_settings
 
   after_create :create_free_ticket
+  after_update :delete_event_schedules
 
   ##
   # Checks if the user is registered to the conference
@@ -78,6 +79,20 @@ class Conference < ActiveRecord::Base
   # * +true+ - If the user isn't registered
   def user_registered? user
     user.present? && registrations.where(user_id: user.id).count > 0
+  end
+
+  ##
+  # Delete all EventSchedules that are not in the hours range
+  # After the conference has been successfully updated
+  def delete_event_schedules
+    if start_hour_changed? || end_hour_changed?
+      event_schedules = program.event_schedules.select do |event_schedule|
+        event_schedule.start_time.hour < start_hour ||
+        event_schedule.end_time.hour > end_hour ||
+        (event_schedule.end_time.hour == end_hour && event_schedule.end_time.minute > 0)
+      end
+      event_schedules.each(&:destroy)
+    end
   end
 
   ##
@@ -579,8 +594,15 @@ class Conference < ActiveRecord::Base
     (email_settings.conference_registration_dates_updated_subject.present? && email_settings.conference_registration_dates_updated_body.present?)
   end
 
+  ##
+  # Checks if the registration limit has been exceeded
+  # Additionally, it takes into account the confirmed speakers that haven't registered yet
+  #
+  # ====Returns
+  # * +True+ -> If the registration limit has been reached or exceeded
+  # * +False+ -> If the registration limit hasn't been exceeded
   def registration_limit_exceeded?
-    registration_limit > 0 && registrations.count >= registration_limit
+    registration_limit > 0 && registrations.count + program.speakers.confirmed.count - program.speakers.confirmed.registered(program.conference).count >= registration_limit
   end
 
   # Returns an hexadecimal color given a collection. The returned color changed

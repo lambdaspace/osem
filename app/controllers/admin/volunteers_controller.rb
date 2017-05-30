@@ -1,9 +1,10 @@
 module Admin
   class VolunteersController < Admin::BaseController
+    include VolunteersHelper
     load_and_authorize_resource :conference, find_by: :short_title
 
     def index
-      if can_manage_volunteers(@conference)
+      if can_manage_volunteers?(@conference)
         render :index
       else
         authorize! :index, :volunteer
@@ -11,7 +12,7 @@ module Admin
     end
 
     def show
-      if can_manage_volunteers(@conference)
+      if can_manage_volunteers?(@conference)
         if @conference.use_vpositions
           @volunteers = @conference.registrations.joins(:vchoices).uniq
         else
