@@ -131,7 +131,7 @@ We are using [rubocop](https://github.com/bbatsov/rubocop) as a style checker. I
 vagrant exec bundle exec rubocop
 ```
 
-You can read through current enabled rules in `.rubocop.yml` file. Explanations of the defined [rules](http://rubydoc.info/github/bbatsov/rubocop/master/frames) can be found in modules [Cop::Lint](http://rubydoc.info/github/bbatsov/rubocop/master/Rubocop/Cop/Lint) and [Cop::Style](http://rubydoc.info/github/bbatsov/rubocop/master/Rubocop/Cop/Style).
+You can read through current enabled rules in `.rubocop.yml` file. Explanations of the defined [rules](http://rubydoc.info/github/bbatsov/rubocop/master/frames) can be found in modules [Cop::Lint](http://rubydoc.info/github/bbatsov/rubocop/master/Rubocop/Cop/Lint) and [Cop::Style](http://rubydoc.info/github/bbatsov/rubocop/master/Rubocop/Cop/Style) and [Cop:Rails](https://rubocop.readthedocs.io/en/latest/cops_rails/).
 Additionally you can read through the [ruby style-guide](https://github.com/bbatsov/ruby-style-guide) to better understand core principles.
 
 ### Test Suite
@@ -216,6 +216,8 @@ If you don't already have a `.env` file you can use the `dotenv.example` as a te
   * Our code needs to be re-written; to avoid code duplication, or make the code more readable, or do things in a simpler way!
 14. **Research**
   * Ideas to explore; and think if there is anything we want to include in our app.
+15. **GSoC**
+  * To group all the issues and PRs related to Google Summer of Code together.
 
 ## Code of Conduct
 OSEM is part of the openSUSE project. We follow all the [openSUSE Guiding Principles!](http://en.opensuse.org/openSUSE:Guiding_principles) If you think someone doesn't do that, please let us know at maintainers@osem.io

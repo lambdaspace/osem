@@ -37,6 +37,9 @@ module Admin
       @registrations = {}
       @registration_weeks = [0]
 
+      @tickets = {}
+      @ticket_weeks = [0]
+
       @conferences.each do |c|
         # Event submissions over time chart
         @submissions[c.short_title] = c.get_submissions_per_week
@@ -45,6 +48,10 @@ module Admin
         # Conference registrations over time chart
         @registrations[c.short_title] = c.get_registrations_per_week
         @registration_weeks.push(@registrations[c.short_title].length)
+
+        # Tickets sold over time chart
+        @tickets[c.short_title] = c.get_tickets_sold_per_week
+        @ticket_weeks.push(@tickets[c.short_title].length)
       end
 
       @cfp_weeks = @cfp_weeks.max
@@ -54,6 +61,10 @@ module Admin
       @registration_weeks = @registration_weeks.max
       @registrations = normalize_array_length(@registrations, @registration_weeks)
       @registration_weeks = @registration_weeks > 0 ? (1..@registration_weeks).to_a : 1
+
+      @ticket_weeks = @ticket_weeks.max
+      @tickets = normalize_array_length(@tickets, @ticket_weeks)
+      @ticket_weeks = @ticket_weeks > 0 ? (1..@ticket_weeks).to_a : 1
 
       @event_distribution = Conference.event_distribution
       @user_distribution = Conference.user_distribution
@@ -82,7 +93,6 @@ module Admin
       short_title = @conference.short_title
       @conference.assign_attributes(conference_params)
       send_mail_on_conf_update = @conference.notify_on_dates_changed?
-      delete_event_schedules if @conference.start_hour_changed? || @conference.end_hour_changed?
 
       if @conference.update_attributes(conference_params)
         ConferenceDateUpdateMailJob.perform_later(@conference) if send_mail_on_conf_update
@@ -132,6 +142,20 @@ module Admin
       if @submissions_data['Weeks']
         @cfp_weeks = @submissions_data['Weeks']
         @submissions_data = @submissions_data.except('Weeks')
+      end
+
+      @tickets_data = {}
+      @tickets_data = @conference.get_tickets_data
+      @ticket_weeks = 0
+      if @tickets_data['Weeks']
+        @ticket_weeks = @tickets_data['Weeks']
+        @tickets_data = @tickets_data.except('Weeks')
+      end
+
+      # Set line color using a hash function
+      @tickets = []
+      @tickets_data.keys.each do |title|
+        @tickets.append(short_title: title, color: "\##{Digest::MD5.hexdigest(title)[0..5]}")
       end
 
       # Doughnut charts
@@ -188,15 +212,6 @@ module Admin
                                          :sponsorship_levels_attributes, :sponsors_attributes,
                                          :targets, :targets_attributes,
                                          :campaigns, :campaigns_attributes, :registration_limit)
-    end
-
-    def delete_event_schedules
-      event_schedules = EventSchedule.select do |e|
-        e.start_time.strftime('%H').to_i < @conference.start_hour ||
-        e.end_time.strftime('%H').to_i > @conference.end_hour ||
-        (e.end_time.strftime('%H').to_i == @conference.end_hour && e.end_time.strftime('%M').to_i > 0)
-      end
-      event_schedules.each(&:destroy)
     end
   end
 end

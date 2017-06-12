@@ -80,7 +80,7 @@ class Ability
 
     can [:new, :create], Registration do |registration|
       conference = registration.conference
-      conference.registration_open? && !conference.registration_limit_exceeded?
+      conference.registration_open? && !conference.registration_limit_exceeded? || conference.program.speakers.confirmed.include?(user)
     end
 
     can :index, Ticket
@@ -118,6 +118,9 @@ class Ability
     cannot [:edit, :update, :destroy], Question, global: true
     # for admins
     can :manage, :all if user.is_admin
+
+    # even admin cannot create new users with ICHAIN enabled
+    cannot [:new, :create], User if ENV['OSEM_ICHAIN_ENABLED'] == 'true'
 
     cannot :revert_object, PaperTrail::Version do |version|
       (version.event == 'create' && %w(Conference User Event).include?(version.item_type))

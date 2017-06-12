@@ -128,6 +128,7 @@ gem 'country_select'
 gem 'prawn_rails'
 
 # to render XLS spreadsheets
+gem 'axlsx', git: 'https://github.com/randym/axlsx.git'
 gem 'axlsx_rails'
 
 # as error catcher
@@ -178,7 +179,7 @@ gem 'cloudinary'
 # for setting app configuration in the environment
 gem 'dotenv-rails'
 
-# For countable.js 
+# For countable.js
 gem "countable-rails", "~> 0.0.1"
 
 # Both are not in a group as we use it also for rake data:demo
@@ -201,6 +202,7 @@ group :development do
   # to launch specs when files are modified
   gem 'guard-rspec', '~> 4.2.8'
   gem 'spring-commands-rspec'
+  gem 'haml_lint', '~> 0.24.0'
   # for static code analisys
   gem 'rubocop', '~> 0.48.1', require: false
   # as database
