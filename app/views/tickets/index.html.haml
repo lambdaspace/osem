@@ -5,7 +5,7 @@
         %h1
           Tickets
       %p.lead
-        Please choose your tickets for 
+        Please choose your tickets for
         %strong
           = @conference.title
         here*
@@ -20,7 +20,7 @@
               %th Total
           %tbody
           - @conference.tickets.each do |ticket|
-            = render partial: 'ticket', f: f, locals: {ticket: ticket}
+            = render partial: 'ticket', f: f, locals: { ticket: ticket }
           %tr
             %td
             %td
@@ -32,7 +32,7 @@
               %h4
                 %strong
                   = @conference.tickets.first.price.symbol
-                  %span{id: 'total_price'}
+                  %span{ id: 'total_price' }
                     0
         .pull-right
           .btn-group-vertical

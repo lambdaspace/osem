@@ -2,7 +2,7 @@
   .col-md-12
     .page-header
       %h1
-        %div{"data-placement" => "left", "data-toggle" => "tooltip", title: @ticket.description}
+        %div{ 'data-placement' => 'left', 'data-toggle' => 'tooltip', title: @ticket.description }
           = @ticket.title
           Ticket
           %small
@@ -34,4 +34,3 @@
               = buyer.affiliation
             %td
               = @ticket.tickets_paid(buyer)
-

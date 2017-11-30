@@ -11,7 +11,7 @@
       locals: { title: 'Tickets sold', data: @tickets_sold_distribution }
     .col-md-4
       = render partial: 'admin/conferences/doughnut_chart',
-      locals: {title: 'Tickets turnover', data: @tickets_turnover_distribution}
+      locals: { title: 'Tickets turnover', data: @tickets_turnover_distribution }
   %br
   - if @physical_tickets.any?
     .row
