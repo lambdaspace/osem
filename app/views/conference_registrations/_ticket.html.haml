@@ -12,7 +12,7 @@
     class: 'form-control quantity', 'data-id' => ticket.id)
   %td.col-sm-1.col-md-1.text-center
     = ticket.price.symbol
-    %span{id: "price_#{ticket.id}"}
+    %span{ id: "price_#{ticket.id}" }
       = humanized_money ticket.price
   %td.col-sm-1.col-md-1.text-center
     %strong
