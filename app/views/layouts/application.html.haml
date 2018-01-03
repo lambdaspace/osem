@@ -9,15 +9,16 @@
     = javascript_include_tag "application"
 
     = csrf_meta_tags
-    :javascript
-      window.liveSettings = {
-        api_key: "#{ENV['OSEM_TRANSIFEX_APIKEY']}",
-        picker: "bottom-right",
-        detectlang: true,
-        autocollect: true
-      };
     = content_for(:script_head)
-    = javascript_include_tag "//cdn.transifex.com/live.js"
+    - if ENV['OSEM_TRANSIFEX_APIKEY']
+      :javascript
+        window.liveSettings = {
+          api_key: "#{ENV['OSEM_TRANSIFEX_APIKEY']}",
+          picker: "bottom-right",
+          detectlang: true,
+          autocollect: true
+        };
+      = javascript_include_tag "//cdn.transifex.com/live.js"
 
     = yield(:head)
   %body
@@ -42,5 +43,5 @@
             You can run, copy, distribute, study, change and improve it.
             The source code and the developers are on
             =link_to "github.", "https://github.com/openSUSE/osem"
-    = content_for(:script_body)
+    = yield :script_body
     = piwik_tracking_tag

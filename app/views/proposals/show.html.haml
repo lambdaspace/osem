@@ -36,7 +36,10 @@
             .col-md-8
               %h4
                 = link_to speaker.name, user_path(speaker.id)
-                = "(#{speaker.email})"
+                %br
+                - if speaker.email_public?
+                  = mail_to "#{ speaker.email }" do
+                    %i.fa.fa-envelope-o.fa-2x
               - if speaker.affiliation?
                 .text-muted
                   from

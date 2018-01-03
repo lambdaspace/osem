@@ -1,6 +1,6 @@
 # cannot delete program if there are events submitted
 
-class Program < ActiveRecord::Base
+class Program < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at], meta: { conference_id: :conference_id }
 
   belongs_to :conference
@@ -42,7 +42,8 @@ class Program < ActiveRecord::Base
   has_many :event_schedules, through: :events
 
   has_many :event_users, through: :events
-  has_many :speakers, -> { distinct }, through: :event_users, source: :user do
+  has_many :program_events_speakers, -> {where(event_role: 'speaker')}, through: :events, source: :event_users
+  has_many :speakers, -> { distinct }, through: :program_events_speakers, source: :user do
     def confirmed
       joins(:events).where(events: { state: :confirmed })
     end
@@ -164,7 +165,7 @@ class Program < ActiveRecord::Base
   # * +False+ -> If there is not any event for the given date
   def any_event_for_this_date?(date)
     parsed_date = DateTime.parse("#{date} 00:00").utc
-    EventSchedule.where(schedule: selected_schedule).where(start_time: parsed_date..(parsed_date + 1)).any?
+    EventSchedule.where(schedule: selected_schedule).where(start_time: parsed_date..(parsed_date + 1.day)).any?
   end
 
   ##
